@@ -1,0 +1,19 @@
+# Rolling reconstruction of a clip at 856x480 with M = 1,000 bucket values per frame.
+model:
+  checkpoint: checkpoints/mgv-flow.pt        # released upon publication
+  decoder: LeanVAE-16ch
+measurements:
+  count: 1000
+  pattern_bank: patterns/pattern-bank.pt     # binary patterns, [10000, 480, 856]
+  shared_across_future_frames: true
+  seed: 20260921
+sampling:
+  steps: 5                                   # Euler steps K
+window:
+  history_frames: 5
+  target_frames: 5
+data:
+  video: path/to/clip.mp4
+  resolution: [480, 856]
+output:
+  root: outputs/reconstruct
