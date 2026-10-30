@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MGV-Flow · Learning to Read Residual Images for Single-Pixel Photography</title>
+  <meta name="description" content="A single-pixel camera that records 0.24% of the pixels and reconstructs video by learning to read residual images.">
+  <meta property="og:title" content="Learning to Read Residual Images for Single-Pixel Photography">
+  <meta property="og:image" content="assets/images/dinner_cut06_poster.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+
+    <h1>Learning to Read Residual Images<br>for Single-Pixel Photography</h1>
+    <p class="authors">
+      <span>Hongjun An<sup>1</sup></span>
+      <span>Shuaizhe An<sup>1</sup></span>
+      <span>Tong Tian<sup>3,4</sup></span>
+      <span>Zhe Sun<sup>1,2,&#x2217;</sup></span>
+    </p>
+    <p class="affils">
+      <span><sup>1</sup>School of Artificial Intelligence, Optics and Electronics (iOPEN), Northwestern Polytechnical University</span>
+      <span><sup>2</sup>Institute of Artificial Intelligence (TeleAI), China Telecom</span>
+      <span><sup>3</sup>Institute of Optics and Quantum Electronics, Abbe Center of Photonics, Friedrich Schiller University Jena</span>
+      <span><sup>4</sup>Helmholtz Institute Jena</span>
+    </p>
+    <p class="notes"><sup>&#x2217;</sup>Corresponding author</p>
+    <nav class="buttons">
+      <a class="btn disabled" title="Coming soon"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z M14 2v6h6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Paper (coming soon)</a>
+      <a class="btn" href="https://github.com/cavedweller509/MGV-Flow"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>Code</a>
+      <a class="btn" href="#demo"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>Demo videos</a>
+    </nav>
+  </div>
+</header>
+
+<section class="teaser">
+  <div class="wrap">
+    <div class="video-panel">
+      <div class="labels"><span>Ground truth</span><span class="ours">MGV-Flow (ours)</span><span>History-FM</span><span>FlowDPS-inspired</span></div>
+      <video src="assets/videos/dinner_cut06.mp4" poster="assets/images/dinner_cut06_poster.jpg" autoplay muted loop playsinline></video>
+    </div>
+    <p class="caption">Video reconstructed from <b>1,000 bucket values per frame</b>, 0.24% of the 856&times;480 pixels. Every five-frame block is read from its own measurements with <i>K</i>&nbsp;=&nbsp;5 Euler steps, and on this validation segment MGV-Flow reaches 22.41&nbsp;dB against 21.85&nbsp;dB for History-FM and 19.26&nbsp;dB for FlowDPS-inspired.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="stats">
+      <div><b>0.24%</b><span>of the pixels measured per frame</span></div>
+      <div><b>256&times;</b><span>faster than per-clip inversion</span></div>
+      <div><b>+4.8&nbsp;dB</b><span>median PSNR over per-clip inversion</span></div>
+      <div><b>&minus;33%</b><span>bucket values with directional fidelity</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Abstract</h2>
+    <p class="abstract">Continuous video scales in cost with camera count, resolution and recording duration, yet many monitoring tasks seek events rather than complete images and can operate on a compact single-pixel measurement stream. Recovering a chosen interval as video is then desirable, but at 0.24% sampling the scene correlation image looks like noise and per-clip optimization takes minutes. Correlating the residual of an estimate with the coding patterns nevertheless gives a <em>residual image</em>, the gradient of a centered measurement loss. Lifted through a pretrained video decoder, its agreement with the true error exceeds that of control decoders. Video-latent inversion (VLI) then outperforms frame-wise image-latent reconstruction at 1,000 bucket values per frame. Measurement-Gradient-Conditioned Video Flow (MGV-Flow), trained once to read the lifted residual image with preceding frames, reconstructs five frames in 1.55&nbsp;s at a median peak signal-to-noise ratio of 22.9&nbsp;dB, against 398&nbsp;s and 18.1&nbsp;dB for VLI, with the largest gains in high-motion scenes. Directional fidelity ranks 30 coding configurations and selects one needing a third fewer bucket values. On a physical system, MGV-Flow outperforms per-frame reconstruction without retraining. A sliding window over the bucket-value stream yields 3.2 frames per second on one RTX&nbsp;4090 and, in theory, 20 frames per second with a 0.23&nbsp;s delay on one data-centre accelerator. The correlation that founded single-pixel imaging thus becomes feedback a generative model learns to read.</p>
+  </div>
+</section>
+
+<section class="tinted" id="method">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <figure>
+      <img src="assets/images/setup.png" alt="Single-pixel recording with a digital micromirror device and one detector">
+      <figcaption>A digital micromirror device displays binary coding patterns and a single-pixel detector records one bucket value per pattern. At 1,000 bucket values per frame, traditional correlation imaging returns noise.</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/images/method.png" alt="Reading residual images with MGV-Flow">
+      <figcaption>The residual between predicted and acquired bucket values, correlated with the coding patterns, is the residual image. The transposed Jacobian of the pretrained video decoder lifts it into the latent space, and MGV-Flow reads it with the history frames for five Euler steps.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <h2>Rolling single-pixel photography</h2>
+    <p class="lead">Rows show the full frames with per-frame PSNR, a zoom on moving content, and the absolute error. Every block of five frames is reconstructed from its own 1,000 bucket values per frame with the five preceding frames as history.</p>
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-clip="red_kayak_cut04">Red kayak I</button>
+      <button class="tab" data-clip="red_kayak_cut01">Red kayak II</button>
+      <button class="tab" data-clip="dinner_cut06">Dinner I</button>
+      <button class="tab" data-clip="dinner_cut02">Dinner II</button>
+      <button class="tab" data-clip="blue_sky_cut01">Blue sky</button>
+    </div>
+    <div class="video-panel">
+      <video id="demo-video" src="assets/videos/red_kayak_cut04_zoom.mp4" poster="assets/images/red_kayak_cut04_zoom_poster.jpg" controls muted loop playsinline preload="metadata"></video>
+    </div>
+    <table class="psnr" id="demo-psnr">
+      <thead><tr><th>Mean PSNR over the segment</th><th class="ours">MGV-Flow</th><th>History-FM</th><th>FlowDPS-inspired</th></tr></thead>
+      <tbody>
+        <tr data-clip="red_kayak_cut04"><td>Red kayak I</td><td class="ours">22.29 dB</td><td>20.71 dB</td><td>18.59 dB</td></tr>
+        <tr data-clip="red_kayak_cut01"><td>Red kayak II</td><td class="ours">19.18 dB</td><td>17.86 dB</td><td>17.66 dB</td></tr>
+        <tr data-clip="dinner_cut06"><td>Dinner I</td><td class="ours">22.41 dB</td><td>21.85 dB</td><td>19.26 dB</td></tr>
+        <tr data-clip="dinner_cut02"><td>Dinner II</td><td class="ours">22.28 dB</td><td>21.83 dB</td><td>19.29 dB</td></tr>
+        <tr data-clip="blue_sky_cut01"><td>Blue sky</td><td class="ours">17.13 dB</td><td>16.75 dB</td><td>16.38 dB</td></tr>
+      </tbody>
+    </table>
+    <p class="fineprint">History-FM is the same flow model conditioned on the preceding frames alone. FlowDPS-inspired adds the measurement gradient to its velocity with a fixed weight. Red kayak clips are from the training split, dinner clips from the validation split and blue sky from the test split.</p>
+  </div>
+</section>
+
+<section class="tinted" id="results">
+  <div class="wrap">
+    <h2>Results</h2>
+    <article class="result c1">
+      <div class="result-head"><span class="badge">1</span><h3>Lifting residual images into a video latent space makes inversion scalable</h3></div>
+      <div class="result-intro">
+        <div class="result-text"><p>Through the pretrained video decoder, the noise-like residual image becomes a structured correction that agrees with the true error better than through re-initialized or weight-shuffled decoders. Video-latent inversion (VLI), which reconstructs five frames jointly in this latent space, outperforms pixel networks and frame-wise image-latent reconstruction (GILM) when bucket values are scarce.</p><p>At 1,000 bucket values per frame, averaged over four resolutions and five test videos, VLI reaches 18.02&nbsp;dB against 16.44&nbsp;dB for GILM and 11.59&nbsp;dB for a U-Net. At 856&times;480 with 10,000 bucket values per frame, joint inversion needs 56.3% less computation and 72.8% less peak GPU memory than GILM.</p></div>
+        <div class="keynums"><div><b>18.02 dB</b><span>VLI at 1,000 bucket values per frame</span></div><div><b>&minus;56.3%</b><span>computation versus frame-wise inversion</span></div></div>
+      </div>
+      <figure class="result-fig">
+        <a href="assets/images/fig1_residual_image.png" target="_blank"><img src="assets/images/fig1_residual_image.png" alt="Residual image, decoder response and true error" loading="lazy"></a>
+        <figcaption><p><b>Figure 1.</b> A noise-like residual image becomes a structured video correction through the pretrained decoder.</p><p><b>a</b> The residual between predicted and acquired bucket values, correlated with the coding patterns, gives the residual image <i>g<sub>x</sub></i>. The transposed Jacobian of the LeanVAE decoder lifts it into the latent space as <i>g<sub>z</sub></i>.</p><p><b>b</b> Ground truth, scene correlation image of traditional correlation imaging (TCI), residual image, decoder response and true error for windows of highest, median and lowest motion. Corr is the Pearson correlation with the true error.</p><p><b>c</b> Band coherence with the true error for the residual image and for the decoder responses of pretrained, re-initialized and weight-shuffled decoders.</p><p><b>d</b> Directional fidelity along a ten-step trajectory, the cosine between the lifted residual image and the true latent correction.</p></figcaption>
+      </figure>
+      <figure class="result-fig">
+        <a href="assets/images/fig2_latent_scaling.png" target="_blank"><img src="assets/images/fig2_latent_scaling.png" alt="Measurement, spatial and computational scaling" loading="lazy"></a>
+        <figcaption><p><b>Figure 2.</b> Measurement, spatial and computational scaling across reconstruction spaces.</p><p><b>a</b> PSNR versus <i>M</i>, the bucket values per frame, for TCI, a convolutional network (CNN), a U-Net, frame-wise image-latent reconstruction (GILM) and video-latent inversion (VLI).</p><p><b>b</b> PSNR advantage of VLI over the U-Net and over GILM across <i>M</i> and resolution.</p><p><b>c</b> Computation per frame and peak GPU memory of GILM and VLI, with the reduction relative to GILM.</p><p><b>d</b> Reconstructions of all methods at two values of <i>M</i>.</p></figcaption>
+      </figure>
+    </article>
+    <article class="result c2">
+      <div class="result-head"><span class="badge">2</span><h3>Reading instead of consuming residual images enables amortized video reconstruction</h3></div>
+      <div class="result-intro">
+        <div class="result-text"><p>MGV-Flow is trained once to read the lifted residual image together with the history frames. A five-frame clip takes 1.55&nbsp;s at <i>K</i>&nbsp;=&nbsp;5 instead of 397.99&nbsp;s with VLI, a median speedup of 256&times;, while median PSNR rises from 18.12 to 22.92&nbsp;dB. VLI fits the measurements far more closely, yet in none of 21 cases does it reach the PSNR of MGV-Flow, because at 0.24% sampling many videos fit the measurements almost equally well.</p><p>Setting the measurement inputs to zero lowers PSNR by 1.57&nbsp;dB and inputs from another video lower it by 0.68&nbsp;dB, so the model reads the measured scene. The benefit of reading grows with motion (Spearman 0.738), where the history predicts the target least.</p></div>
+        <div class="keynums"><div><b>256&times;</b><span>faster than per-clip inversion</span></div><div><b>+4.8 dB</b><span>median PSNR over VLI</span></div></div>
+      </div>
+      <figure class="result-fig">
+        <a href="assets/images/fig3_read_vs_consume.png" target="_blank"><img src="assets/images/fig3_read_vs_consume.png" alt="Reading versus consuming the residual image" loading="lazy"></a>
+        <figcaption><p><b>Figure 3.</b> Reading versus consuming the residual image.</p><p><b>a</b> MGV-Flow predicts its velocity by reading the history, the normalized physical direction and a quality descriptor. History-FM omits the measurement inputs, FlowDPS-inspired adds the physical direction to the velocity with a fixed weight, and VLI optimizes a network anew for every clip.</p><p><b>b</b> Latency per five-frame clip and PSNR, with the speedup over VLI.</p><p><b>c</b> Measurement NMSE and PSNR during VLI optimization against MGV-Flow at <i>K</i>&nbsp;=&nbsp;5. VLI fits the measurements more closely but stays below in PSNR.</p><p><b>d</b> PSNR gain of the correct measurements over zeroed and shuffled measurement inputs across Euler steps <i>K</i>.</p></figcaption>
+      </figure>
+      <figure class="result-fig">
+        <a href="assets/images/fig4_motion.png" target="_blank"><img src="assets/images/fig4_motion.png" alt="Benefit of reading versus motion" loading="lazy"></a>
+        <figcaption><p><b>Figure 4.</b> Reading the residual image pays off where the history cannot predict the target.</p><p><b>a</b> PSNR difference of MGV-Flow versus History-FM against the motion score, the copy error from the last history frame to the five target frames.</p><p><b>b</b> Mean PSNR difference versus History-FM in the high, middle and low motion groups across Euler steps <i>K</i>.</p><p><b>c</b> The same versus FlowDPS-inspired. Bands are 95% bootstrap intervals over 35 validation windows with three seeds each.</p></figcaption>
+      </figure>
+    </article>
+    <article class="result c3">
+      <div class="result-head"><span class="badge">3</span><h3>Directional fidelity of residual images reveals coding-pattern utility</h3></div>
+      <div class="result-intro">
+        <div class="result-text"><p>Directional fidelity measures whether the lifted residual image points toward the true latent correction, at the cost of one residual image and one decoder vector-Jacobian product and without running a reconstruction. Across 30 configurations of pattern family, grain size and measurement count, it predicts reconstruction quality with a Spearman correlation of 0.779 (95% confidence interval 0.644 to 0.862).</p><p>Ranked on calibration windows, the top configuration, a Walsh basis at 16&nbsp;px, matches the median-ranked configuration at 3,000 bucket values per frame with only 2,000 and exceeds it in all eight held-out windows. The best pattern also depends on the video autoencoder.</p></div>
+        <div class="keynums"><div><b>0.779</b><span>Spearman correlation with quality</span></div><div><b>&minus;33%</b><span>bucket values for the same quality</span></div></div>
+      </div>
+      <figure class="result-fig">
+        <a href="assets/images/fig5a_pattern_gradients.png" target="_blank"><img src="assets/images/fig5a_pattern_gradients.png" alt="Residual images of three coding configurations" loading="lazy"></a>
+        <figcaption><p><b>Figure 5.</b> Residual images of three coding configurations at 3,000 bucket values per frame on one held-out window.</p><p>Rows are a Walsh basis at 16&nbsp;px, phase-speckle patterns at 32&nbsp;px and a low-frequency Fourier basis at 4&nbsp;px. Columns show a coding pattern, the residual image, the decoder response, the decoded latent correction and the reconstruction after ten physics-only steps. <i>C</i> is the directional fidelity and Pearson the correlation between decoder response and decoded latent correction. The pattern whose feedback points best also reconstructs best.</p></figcaption>
+      </figure>
+      <figure class="result-fig">
+        <a href="assets/images/fig5_pattern_utility.png" target="_blank"><img src="assets/images/fig5_pattern_utility.png" alt="Directional fidelity reveals coding-pattern utility" loading="lazy"></a>
+        <figcaption><p><b>Figure 6.</b> Directional fidelity reveals coding-pattern utility.</p><p><b>a</b> Directional fidelity <i>C</i> is the cosine between the negative lifted residual image and the true latent correction at a probe latent.</p><p><b>b</b> Reconstruction PSNR versus mean <i>C</i> over 30 configurations, with the Spearman correlation and its 95% confidence interval.</p><p><b>c</b> Mean <i>C</i> versus <i>M</i> for five pattern families with LeanVAE.</p><p><b>d</b> Mean <i>C</i> of the families with four video autoencoders, LeanVAE, VidTok, Wan and HunyuanVideo.</p><p><b>e</b> PSNR versus <i>M</i> for the selected Walsh basis and the median-ranked phase speckle. The Walsh basis matches the comparator at 2,000 bucket values per frame.</p></figcaption>
+      </figure>
+    </article>
+    <article class="result c4">
+      <div class="result-head"><span class="badge">4</span><h3>On physical measurements, reading transfers without retraining</h3></div>
+      <div class="result-intro">
+        <div class="result-text"><p>On bucket values acquired by a physical single-pixel system with structured illumination, MGV-Flow, neither retrained nor fine-tuned, predicts frames 6 to 10 of two animated film excerpts from 10,000 measured bucket values per frame and five ground-truth history frames. It reaches an equalized PSNR of 10.25&nbsp;dB against 8.63&nbsp;dB for GILM, the best per-frame method, and produces five frames in 7.85&nbsp;s while GILM needs 44.13&nbsp;s for each frame.</p><p>Bucket values of the other clip lower PSNR in all six runs, and the measurement residual falls to 0.54 to 0.61 of its initial value against 0.65 to 0.69 for the other clip, so the model reads the physical measurements.</p></div>
+        <div class="keynums"><div><b>10.25 dB</b><span>equalized PSNR against 8.63 dB</span></div><div><b>7.85 s</b><span>for five frames on hardware data</span></div></div>
+      </div>
+      <figure class="result-fig">
+        <a href="assets/images/fig_optical_setup.jpg" target="_blank"><img src="assets/images/fig_optical_setup.jpg" alt="Physical single-pixel photography system, top view" loading="lazy"></a>
+        <figcaption><p><b>Figure 7.</b> Physical single-pixel photography system, top view.</p><p>A laser beam passes two lenses and a beam expander and is folded by a mirror onto a digital micromirror device (DMD), which displays the binary coding patterns. Two lenses project the patterns onto the scene, and a fifth lens collects the light onto the single-pixel detector, which records one bucket value per pattern. The red line marks the beam path.</p></figcaption>
+      </figure>
+      <figure class="result-fig">
+        <a href="assets/images/fig6_physical.png" target="_blank"><img src="assets/images/fig6_physical.png" alt="Physical single-pixel reconstruction" loading="lazy"></a>
+        <figcaption><p><b>Figure 8.</b> Physical single-pixel reconstruction with 10,000 measured bucket values per frame.</p><p><b>a</b> For two clips, the last ground-truth history frame, the ground-truth frames 6 to 10 and the frames MGV-Flow predicts from the measured bucket values with <i>K</i>&nbsp;=&nbsp;5.</p><p><b>b</b> Equalized PSNR of each frame for MGV-Flow and for per-frame reconstruction by a CNN, a U-Net and GILM.</p><p><b>c</b> RMS of the measurement residual along the Euler steps, normalized by its first value, with the measured bucket values and with those of the other clip.</p></figcaption>
+      </figure>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Imaging rate and compute</h2>
+    <div class="split">
+      <img src="assets/images/fig_imaging_rate.png" alt="Output frame rate versus compute">
+      <div>
+        <p>The detector delivers bucket values as a continuous stream, so reconstruction runs as a sliding window over the most recent measurements, and the reconstruction delay is the latency of one five-frame block.</p>
+        <table class="rate">
+          <thead><tr><th>Hardware</th><th>K&nbsp;=&nbsp;5</th><th>Delay</th></tr></thead>
+          <tbody>
+            <tr><td>RTX 4090 <span class="tag measured">measured</span></td><td>3.2 fps</td><td>1.55 s</td></tr>
+            <tr><td>RTX 3090 <span class="tag">scaled</span></td><td>2.0 fps</td><td>2.51 s</td></tr>
+            <tr><td>RTX 5090 <span class="tag">theoretical</span></td><td>6.4 fps</td><td>0.78 s</td></tr>
+            <tr><td>H100 <span class="tag">theoretical</span></td><td>10.0 fps</td><td>0.50 s</td></tr>
+            <tr><td>B200 <span class="tag">theoretical</span></td><td>21.9 fps</td><td>0.23 s</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tinted">
+  <div class="wrap">
+    <h2>Code</h2>
+    <p>Code is available at <a href="https://github.com/cavedweller509/MGV-Flow">github.com/cavedweller509/MGV-Flow</a>, including the single-pixel operator, residual and lifted residual images, Euler sampling, directional fidelity and the sliding-window camera loop.</p>
+<pre><code>git clone https://github.com/cavedweller509/MGV-Flow.git
+cd MGV-Flow &amp;&amp; pip install -e ".[test]" &amp;&amp; pytest</code></pre>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Citation</h2>
+<pre><code>@article{sun2026mgvflow,
+  title   = {Learning to Read Residual Images for Single-Pixel Photography},
+  author  = {An, Hongjun and An, Shuaizhe and Tian, Tong and Sun, Zhe},
+  year    = {2026}
+}</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">MGV-Flow · Northwestern Polytechnical University and TeleAI, China Telecom</div>
+</footer>
+
+<script>
+  const video = document.getElementById('demo-video');
+  const rows = document.querySelectorAll('#demo-psnr tbody tr');
+  function select(clip) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.clip === clip));
+    rows.forEach(r => r.classList.toggle('active', r.dataset.clip === clip));
+    video.src = `assets/videos/${clip}_zoom.mp4`;
+    video.poster = `assets/images/${clip}_zoom_poster.jpg`;
+    video.play();
+  }
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => select(t.dataset.clip)));
+  rows.forEach(r => r.addEventListener('click', () => select(r.dataset.clip)));
+  rows[0].classList.add('active');
+</script>
+</body>
+</html>
